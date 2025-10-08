@@ -1,4 +1,4 @@
-<div @if ($pollingInterval) wire:poll.{{ $pollingInterval }}s @endif>
+<div @if ($pollingInterval) wire:poll.{{ $pollingInterval }} @endif>
     @if ($this->comments->isEmpty())
         <div class="comm:flex comm:items-center comm:justify-center comm:p-6 comm:text-center comm:rounded-lg comm:border comm:border-dashed comm:border-gray-300 comm:dark:border-gray-700">
             <div class="comm:flex comm:flex-col comm:items-center comm:gap-y-2">
@@ -8,7 +8,7 @@
                 />
 
                 <span class="comm:text-sm comm:font-medium comm:text-gray-500 comm:dark:text-gray-400">
-                    {{ __('No comments yet.') }}
+                    {{ __('commentions::comments.no_comments_yet') }}
                 </span>
             </div>
         </div>
@@ -21,4 +21,16 @@
             :mentionables="$mentionables"
         />
     @endforeach
+
+    @if ($this->hasMore)
+        <div class="comm:mt-2">
+            <x-filament::button
+                color="gray"
+                size="sm"
+                wire:click="loadMore"
+                wire:target="loadMore"
+                wire:loading.attr="disabled"
+            >{{ $loadMoreLabel }}</x-filament::button>
+        </div>
+    @endif
 </div>

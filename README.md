@@ -27,8 +27,8 @@ $ php artisan migrate --seed
 ----
 
 ## 畫面截圖
-![](https://i.imgur.com/hYbwWyt.png)
+![](https://i.imgur.com/zCOWbYs.png)
 > 使用評論來集中管理意見回饋
 
-![](https://i.imgur.com/oduzIoi.png)
+![](https://i.imgur.com/juvTTMI.png)
 > 使用 @ 提及成員，將該成員帶入任務評論中的討論

@@ -1,10 +1,10 @@
 @use('\Kirschbaum\Commentions\Config')
 
-<div class="comm:flex comm:items-start comm:gap-x-4 comm:border comm:p-4 comm:rounded-lg comm:shadow-sm comm:mb-2" id="filament-comment-{{ $comment->getId() }}">
+<div class="comm:flex comm:items-start comm:gap-x-4 comm:border comm:border-gray-300 comm:dark:border-gray-700 comm:p-4 comm:rounded-lg comm:shadow-sm comm:mb-2" id="filament-comment-{{ $comment->getId() }}">
     @if ($avatar = $comment->getAuthorAvatar())
         <img
             src="{{ $comment->getAuthorAvatar() }}"
-            alt="{{ __('User Avatar') }}"
+            alt="{{ __('commentions::comments.user_avatar_alt') }}"
             class="comm:w-10 comm:h-10 comm:rounded-full comm:mt-0.5 comm:object-cover comm:object-center"
         />
     @else
@@ -17,14 +17,14 @@
                 {{ $comment->getAuthorName() }}
                 <span
                     class="comm:text-xs comm:text-gray-500 comm:dark:text-gray-300"
-                    title="Commented at {{ $comment->getCreatedAt()->format('Y-m-d H:i:s') }}"
+                    title="{{ __('commentions::comments.commented_at', ['datetime' => $comment->getCreatedAt()->format('Y-m-d H:i:s')]) }}"
                 >{{ $comment->getCreatedAt()->diffForHumans() }}</span>
 
                 @if ($comment->getUpdatedAt()->gt($comment->getCreatedAt()))
                     <span
                         class="comm:text-xs comm:text-gray-300 comm:ml-1"
-                        title="Edited at {{ $comment->getUpdatedAt()->format('Y-m-d H:i:s') }}"
-                    >{{ __('(edited)') }}</span>
+                        title="{{ __('commentions::comments.edited_at', ['datetime' => $comment->getUpdatedAt()->format('Y-m-d H:i:s')]) }}"
+                    >({{ __('commentions::comments.edited') }})</span>
                 @endif
 
                 @if ($comment->getLabel())
@@ -46,12 +46,44 @@
                     @endif
 
                     @if (Config::resolveAuthenticatedUser()?->can('delete', $comment))
-                        <x-filament::icon-button
-                            icon="heroicon-s-trash"
-                            wire:click="$dispatch('open-modal', { id: 'delete-comment-modal-{{ $comment->getId() }}' })"
-                            size="xs"
-                            color="gray"
-                        />
+                        <x-filament::modal
+                            id="delete-comment-modal-{{ $comment->getId() }}"
+                            width="sm"
+                        >
+                            <x-slot name="trigger">
+                                <x-filament::icon-button
+                                    icon="heroicon-s-trash"
+                                    size="xs"
+                                    color="gray"
+                                />
+                            </x-slot>
+
+                            <x-slot name="heading">
+                                {{ __('commentions::comments.delete_comment_heading') }}
+                            </x-slot>
+
+                            <div class="comm:py-4">
+                                {{ __('commentions::comments.delete_comment_body') }}
+                            </div>
+
+                            <x-slot name="footer">
+                                <div class="comm:flex comm:justify-end comm:gap-x-4">
+                                    <x-filament::button
+                                        wire:click="$dispatch('close-modal', { id: 'delete-comment-modal-{{ $comment->getId() }}' })"
+                                        color="gray"
+                                    >
+                                        {{ __('commentions::comments.cancel') }}
+                                    </x-filament::button>
+
+                                    <x-filament::button
+                                        wire:click="delete"
+                                        color="danger"
+                                    >
+                                        {{ __('commentions::comments.delete') }}
+                                    </x-filament::button>
+                                </div>
+                            </x-slot>
+                        </x-filament::modal>
                     @endif
                 </div>
             @endif
@@ -70,7 +102,7 @@
                         wire:click="updateComment({{ $comment->getId() }})"
                         size="sm"
                     >
-                        {{ __('Save') }}
+                        {{ __('commentions::comments.save') }}
                     </x-filament::button>
 
                     <x-filament::button
@@ -78,7 +110,7 @@
                         size="sm"
                         color="gray"
                     >
-                        {{ __('Cancel') }}
+                        {{ __('commentions::comments.cancel') }}
                     </x-filament::button>
                 </div>
             </div>
@@ -93,38 +125,4 @@
             @endif
         @endif
     </div>
-
-    @if ($comment->isComment() && \Kirschbaum\Commentions\Config::resolveAuthenticatedUser()?->can('delete', $comment))
-        <x-filament::modal
-            id="delete-comment-modal-{{ $comment->getId() }}"
-            wire:model="showDeleteModal"
-            width="sm"
-        >
-            <x-slot name="heading">
-                {{ __('Delete Comment') }}
-            </x-slot>
-
-            <div class="comm:py-4">
-                {{ __('Are you sure you want to delete this comment? This action cannot be undone.') }}
-            </div>
-
-            <x-slot name="footer">
-                <div class="comm:flex comm:justify-end comm:gap-x-4">
-                    <x-filament::button
-                        wire:click="$dispatch('close-modal', { id: 'delete-comment-modal-{{ $comment->getId() }}' })"
-                        color="gray"
-                    >
-                        {{ __('Cancel') }}
-                    </x-filament::button>
-
-                    <x-filament::button
-                        wire:click="delete"
-                        color="danger"
-                    >
-                        {{ __('Delete') }}
-                    </x-filament::button>
-                </div>
-            </x-slot>
-        </x-filament::modal>
-    @endif
 </div>
